@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PinkGlow — Content Planner & Analytics</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        pinksoft: {
+                            50: '#FFF5F8',
+                            100: '#FFE8F0',
+                            200: '#FFD1E1',
+                            300: '#FFADC9',
+                            400: '#FF7AA8',
+                            500: '#F44B87',
+                            600: '#DB2768',
+                            700: '#B81852',
+                            800: '#981746',
+                            900: '#7F183E',
+                            950: '#4A1228',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FFF5F8;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 209, 225, 0.45) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(255, 232, 240, 0.6) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 173, 201, 0.25) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: #4A2533;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFE8F0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FFADC9;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FF7AA8;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 173, 201, 0.45);
+            box-shadow: 0 8px 30px -6px rgba(244, 75, 135, 0.08);
+        }
+
+        .pink-gradient-btn {
+            background: linear-gradient(135deg, #FF7AA8 0%, #F44B87 100%);
+            transition: all 0.25s ease;
+        }
+        .pink-gradient-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px -4px rgba(244, 75, 135, 0.45);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            border-radius: 0.875rem;
+            overflow: hidden;
+            background: #2A121B;
+        }
+        .video-container iframe,
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Animasi perpindahan halaman */
+        .page-section {
+            animation: fadeIn 0.25s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-pinksoft-200 selection:text-pinksoft-900 pb-20 md:pb-8">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Header & Navigasi 4 Menu Terpisah -->
+    <header class="sticky top-0 z-30 glass-card border-b border-pinksoft-200/70">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <!-- Logo Brand -->
+                <div class="flex items-center justify-between">
+                    <div onclick="switchPage('home')" class="cursor-pointer flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl pink-gradient-btn flex items-center justify-center text-white shadow-md">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-display font-extrabold text-lg sm:text-xl text-pinksoft-900 tracking-tight flex items-center gap-2">
+                                Rahma Calender
+                                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-pinksoft-100 text-pinksoft-600 border border-pinksoft-200">5 Video/Minggu</span>
+                            </h1>
+                            <p class="text-[11px] text-pinksoft-700/80 hidden sm:block">Manajemen Jadwal, Ide Viral & Penilaian Algoritma</p>
+                        </div>
+                    </div>
+
+                    <button onclick="openContentModal()" class="md:hidden px-3.5 py-2 rounded-xl pink-gradient-btn text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Tambah</span>
+                    </button>
+                </div>
+
+                <!-- Menu Navigasi 4 Halaman Utama (Desktop & Tablet) -->
+                <nav class="hidden md:flex items-center gap-1.5 bg-pinksoft-100/80 p-1.5 rounded-2xl border border-pinksoft-200/80">
+                    <button onclick="switchPage('home')" data-nav="home" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Menu Utama</span>
+                    </button>
+                    <button onclick="switchPage('calendar')" data-nav="calendar" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                        <i data-lucide="calendar-days" class="w-4 h-4"></i>
+                        <span>Kalender</span>
+                    </button>
+                    <button onclick="switchPage('recommendations')" data-nav="recommendations" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                        <i data-lucide="flame" class="w-4 h-4"></i>
+                        <span>Rekomendasi</span>
+                    </button>
+                    <button onclick="switchPage('chart')" data-nav="chart" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                        <span>Grafik Konten</span>
+                    </button>
+                </nav>
+
+                <!-- Tombol Aksi Cepat Desktop -->
+                <div class="hidden md:flex items-center gap-2">
+                    <button onclick="openContentModal()" class="px-4 py-2.5 rounded-xl pink-gradient-btn text-white font-semibold text-xs flex items-center gap-2 shadow-sm">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Tambah Konten</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Bottom Navigation Bar untuk Mobile -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 glass-card border-t border-pinksoft-200 px-2 py-2 flex items-center justify-around">
+        <button onclick="switchPage('home')" data-nav="home" class="nav-btn flex-1 py-1.5 rounded-xl flex flex-col items-center gap-1 text-[11px] font-bold transition">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Utama</span>
+        </button>
+        <button onclick="switchPage('calendar')" data-nav="calendar" class="nav-btn flex-1 py-1.5 rounded-xl flex flex-col items-center gap-1 text-[11px] font-bold transition">
+            <i data-lucide="calendar-days" class="w-4 h-4"></i>
+            <span>Kalender</span>
+        </button>
+        <button onclick="switchPage('recommendations')" data-nav="recommendations" class="nav-btn flex-1 py-1.5 rounded-xl flex flex-col items-center gap-1 text-[11px] font-bold transition">
+            <i data-lucide="flame" class="w-4 h-4"></i>
+            <span>Rekomendasi</span>
+        </button>
+        <button onclick="switchPage('chart')" data-nav="chart" class="nav-btn flex-1 py-1.5 rounded-xl flex flex-col items-center gap-1 text-[11px] font-bold transition">
+            <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+            <span>Grafik</span>
+        </button>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ========================================================= -->
+        <!-- HALAMAN 1: MENU UTAMA (Best Performing & Informasi Status)  -->
+        <!-- ========================================================= -->
+        <section id="page-home" class="page-section space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <h2 class="font-display font-extrabold text-xl sm:text-2xl text-pinksoft-950">Menu Utama</h2>
+                    <p class="text-xs sm:text-sm text-pinksoft-700/80">Ringkasan jumlah produksi konten dan performa video terbaik Anda</p>
+                </div>
+                <button onclick="switchPage('calendar')" class="self-start sm:self-auto px-4 py-2 rounded-xl bg-pinksoft-100 hover:bg-pinksoft-200 text-pinksoft-700 text-xs font-bold flex items-center gap-1.5 transition border border-pinksoft-300/60">
+                    <span>Kelola Jadwal di Kalender</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- 4 Kartu Informasi Jumlah Konten -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div onclick="goToCalendarWithFilter('IDE')" class="cursor-pointer glass-card rounded-3xl p-5 hover:border-pinksoft-400 transition group">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="p-3 rounded-2xl bg-pinksoft-100 text-pinksoft-600 group-hover:scale-110 transition">
+                            <i data-lucide="lightbulb" class="w-5 h-5"></i>
+                        </span>
+                        <span class="text-xs font-bold text-pinksoft-500 uppercase">Ide Konten</span>
+                    </div>
+                    <div id="stat-ide" class="font-display font-extrabold text-3xl sm:text-4xl text-pinksoft-950">0</div>
+                    <p class="text-xs text-pinksoft-700/75 mt-1">Bank ide siap dieksekusi</p>
+                </div>
+
+                <div onclick="goToCalendarWithFilter('EDITING')" class="cursor-pointer glass-card rounded-3xl p-5 hover:border-amber-400 transition group">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="p-3 rounded-2xl bg-amber-100 text-amber-600 group-hover:scale-110 transition">
+                            <i data-lucide="scissors" class="w-5 h-5"></i>
+                        </span>
+                        <span class="text-xs font-bold text-amber-600 uppercase">Proses Editing</span>
+                    </div>
+                    <div id="stat-editing" class="font-display font-extrabold text-3xl sm:text-4xl text-pinksoft-950">0</div>
+                    <p class="text-xs text-pinksoft-700/75 mt-1">Video sedang diedit</p>
+                </div>
+
+                <div onclick="goToCalendarWithFilter('SCHEDULED')" class="cursor-pointer glass-card rounded-3xl p-5 hover:border-purple-400 transition group">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="p-3 rounded-2xl bg-purple-100 text-purple-600 group-hover:scale-110 transition">
+                            <i data-lucide="clock" class="w-5 h-5"></i>
+                        </span>
+                        <span class="text-xs font-bold text-purple-600 uppercase">Siap Tayang</span>
+                    </div>
+                    <div id="stat-scheduled" class="font-display font-extrabold text-3xl sm:text-4xl text-pinksoft-950">0</div>
+                    <p class="text-xs text-pinksoft-700/75 mt-1">Terjadwal siap upload</p>
+                </div>
+
+                <div onclick="goToCalendarWithFilter('POSTED')" class="cursor-pointer glass-card rounded-3xl p-5 hover:border-emerald-400 transition group">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="p-3 rounded-2xl bg-emerald-100 text-emerald-600 group-hover:scale-110 transition">
+                            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                        </span>
+                        <span class="text-xs font-bold text-emerald-600 uppercase">Sudah Tayang</span>
+                    </div>
+                    <div id="stat-posted" class="font-display font-extrabold text-3xl sm:text-4xl text-pinksoft-950">0</div>
+                    <p class="text-xs text-pinksoft-700/75 mt-1">Konten sudah ter-post</p>
+                </div>
+            </div>
+
+            <!-- Baris Bawah Menu Utama: Best Performing Content & Target Mingguan -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                <!-- Kartu Best Performing Content -->
+                <div class="lg:col-span-7 glass-card rounded-3xl p-6 bg-gradient-to-br from-white via-pinksoft-50 to-pinksoft-100/90 border-pinksoft-300 relative overflow-hidden">
+                    <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-pinksoft-200/40 blur-2xl"></div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-pinksoft-500 text-white shadow-sm">
+                            <i data-lucide="crown" class="w-4 h-4"></i> Best Performing Content
+                        </span>
+                        <span id="best-platform-badge" class="text-xs font-semibold text-pinksoft-700 bg-white px-3 py-1 rounded-xl border border-pinksoft-200">-</span>
+                    </div>
+
+                    <h3 id="best-title" class="font-display font-extrabold text-lg sm:text-xl text-pinksoft-950">Belum ada data evaluasi</h3>
+                    <p id="best-insight" class="text-xs sm:text-sm text-pinksoft-800/80 mt-1.5 leading-relaxed">
+                        Input statistik Views, Likes, dan Komentar pada menu Grafik Konten untuk mengetahui video paling rame.
+                    </p>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-4 border-t border-pinksoft-200/80 text-center">
+                        <div class="bg-white/90 rounded-2xl p-3 border border-pinksoft-100">
+                            <div class="text-[11px] text-pinksoft-600 font-semibold">Skor Algoritma</div>
+                            <div id="best-score" class="font-display font-extrabold text-lg text-pinksoft-600 mt-0.5">0</div>
+                        </div>
+                        <div class="bg-white/90 rounded-2xl p-3 border border-pinksoft-100">
+                            <div class="text-[11px] text-pinksoft-600 font-semibold">ER %</div>
+                            <div id="best-er" class="font-display font-extrabold text-lg text-emerald-600 mt-0.5">0%</div>
+                        </div>
+                        <div class="bg-white/90 rounded-2xl p-3 border border-pinksoft-100">
+                            <div class="text-[11px] text-pinksoft-600 font-semibold">Total Likes</div>
+                            <div id="best-likes" class="font-display font-extrabold text-lg text-pinksoft-950 mt-0.5">0</div>
+                        </div>
+                        <div class="bg-white/90 rounded-2xl p-3 border border-pinksoft-100">
+                            <div class="text-[11px] text-pinksoft-600 font-semibold">Total Komen</div>
+                            <div id="best-comments" class="font-display font-extrabold text-lg text-pinksoft-950 mt-0.5">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Target Mingguan & Navigasi Cepat -->
+                <div class="lg:col-span-5 glass-card rounded-3xl p-6 flex flex-col justify-between gap-4">
+                    <div>
+                        <h3 class="font-display font-bold text-base text-pinksoft-950 flex items-center gap-2">
+                            <i data-lucide="target" class="w-5 h-5 text-pinksoft-500"></i>
+                            Target Upload Minggu Ini
+                        </h3>
+                        <p class="text-xs text-pinksoft-700/80 mt-1">Konsistensi 5 video per minggu untuk menjaga performa algoritma IG, TikTok & Facebook.</p>
+
+                        <div class="mt-4 p-4 rounded-2xl bg-pinksoft-50 border border-pinksoft-200/80">
+                            <div class="flex items-center justify-between text-xs font-bold mb-2">
+                                <span class="text-pinksoft-900">Progress Mingguan</span>
+                                <span id="weekly-progress-text" class="text-pinksoft-600">0 / 5 Video</span>
+                            </div>
+                            <div class="w-full h-3 bg-pinksoft-200/70 rounded-full overflow-hidden">
+                                <div id="weekly-progress-bar" class="h-full pink-gradient-btn rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5 pt-2">
+                        <button onclick="switchPage('recommendations')" class="p-3 rounded-2xl bg-pinksoft-50 hover:bg-pinksoft-100 border border-pinksoft-200 text-left transition">
+                            <div class="text-xs font-bold text-pinksoft-900 flex items-center gap-1.5">
+                                <i data-lucide="flame" class="w-4 h-4 text-pinksoft-500"></i> Ide Viral
+                            </div>
+                            <p class="text-[11px] text-pinksoft-700/80 mt-0.5">Lihat topik trending</p>
+                        </button>
+                        <button onclick="switchPage('chart')" class="p-3 rounded-2xl bg-pinksoft-50 hover:bg-pinksoft-100 border border-pinksoft-200 text-left transition">
+                            <div class="text-xs font-bold text-pinksoft-900 flex items-center gap-1.5">
+                                <i data-lucide="bar-chart-3" class="w-4 h-4 text-pinksoft-500"></i> Nilai Konten
+                            </div>
+                            <p class="text-[11px] text-pinksoft-700/80 mt-0.5">Edit like, komen & view</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- HALAMAN 2: KALENDER (Jadwal Konten & Pengeditan Konten)   -->
+        <!-- ========================================================= -->
+        <section id="page-calendar" class="page-section hidden space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h2 class="font-display font-extrabold text-xl sm:text-2xl text-pinksoft-950">Kalender & Pengeditan Konten</h2>
+                    <p class="text-xs sm:text-sm text-pinksoft-700/80">Atur jadwal tayang, putar video referensi, dan kelola status produksi konten</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="autoScheduleWeek()" class="px-3.5 py-2.5 rounded-xl bg-pinksoft-100 hover:bg-pinksoft-200 text-pinksoft-700 font-semibold text-xs flex items-center gap-1.5 transition border border-pinksoft-300/60">
+                        <i data-lucide="calendar-check-2" class="w-4 h-4"></i>
+                        <span>Auto-Isi 5 Jadwal</span>
+                    </button>
+                    <button onclick="openContentModal()" class="px-4 py-2.5 rounded-xl pink-gradient-btn text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Tambah Konten Baru</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="glass-card rounded-2xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-1.5" id="status-filter-tabs">
+                    <button onclick="setFilterStatus('ALL')" data-filter="ALL" class="filter-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-pinksoft-500 text-white shadow-xs transition">Semua Konten</button>
+                    <button onclick="setFilterStatus('IDE')" data-filter="IDE" class="filter-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-pinksoft-100/80 text-pinksoft-700 hover:bg-pinksoft-200 transition">💡 Ide Konten</button>
+                    <button onclick="setFilterStatus('EDITING')" data-filter="EDITING" class="filter-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-pinksoft-100/80 text-pinksoft-700 hover:bg-pinksoft-200 transition">✂️ Proses Edit</button>
+                    <button onclick="setFilterStatus('SCHEDULED')" data-filter="SCHEDULED" class="filter-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-pinksoft-100/80 text-pinksoft-700 hover:bg-pinksoft-200 transition">⏰ Siap Tayang</button>
+                    <button onclick="setFilterStatus('POSTED')" data-filter="POSTED" class="filter-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-pinksoft-100/80 text-pinksoft-700 hover:bg-pinksoft-200 transition">✅ Sudah Tayang</button>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <select id="platform-filter" onchange="renderContentGrid()" class="px-3 py-1.5 rounded-xl bg-pinksoft-50 border border-pinksoft-200 text-xs font-semibold text-pinksoft-800 focus:outline-none focus:border-pinksoft-500">
+                        <option value="ALL">Semua Platform</option>
+                        <option value="Instagram">Instagram Reels</option>
+                        <option value="TikTok">TikTok</option>
+                        <option value="Facebook">Facebook</option>
+                    </select>
+                    <div class="relative flex-1 sm:w-56">
+                        <i data-lucide="search" class="w-3.5 h-3.5 text-pinksoft-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="search-input" oninput="renderContentGrid()" placeholder="Cari ide / judul..." class="w-full pl-8 pr-3 py-1.5 rounded-xl bg-pinksoft-50 border border-pinksoft-200 text-xs text-pinksoft-900 placeholder-pinksoft-400 focus:outline-none focus:border-pinksoft-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid Kartu Jadwal Konten -->
+            <div id="content-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Kartu konten di-render di sini -->
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- HALAMAN 3: REKOMENDASI (Ide Konten yang Lagi Viral)       -->
+        <!-- ========================================================= -->
+        <section id="page-recommendations" class="page-section hidden space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h2 class="font-display font-extrabold text-xl sm:text-2xl text-pinksoft-950">Rekomendasi Konten Viral</h2>
+                    <p class="text-xs sm:text-sm text-pinksoft-700/80">Kumpulan ide konten yang sedang ramai & dapat Anda edit atau tambahkan sendiri</p>
+                </div>
+                <button onclick="openViralModal()" class="self-start sm:self-auto px-4 py-2.5 rounded-xl pink-gradient-btn text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>Tambah Ide Viral Baru</span>
+                </button>
+            </div>
+
+            <!-- Insight Otomatis Berdasarkan Data Konten Anda -->
+            <div class="glass-card rounded-3xl p-5">
+                <h3 class="font-display font-bold text-base text-pinksoft-950 flex items-center gap-2 mb-3">
+                    <i data-lucide="wand-2" class="w-5 h-5 text-pinksoft-500"></i>
+                    Analisis Otomatis dari Performa Akun Anda
+                </h3>
+                <div id="algorithm-recommendations" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <!-- Rekomendasi otomatis dari data H+7 -->
+                </div>
+            </div>
+
+            <!-- Daftar Kartu Rekomendasi Konten Viral (Editable oleh Pengguna) -->
+            <div id="viral-list-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Kartu ide viral di-render di sini -->
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- HALAMAN 4: GRAFIK KONTEN (Penilaian & Edit Like/Komen/View)-->
+        <!-- ========================================================= -->
+        <section id="page-chart" class="page-section hidden space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h2 class="font-display font-extrabold text-xl sm:text-2xl text-pinksoft-950">Grafik & Penilaian Konten</h2>
+                    <p class="text-xs sm:text-sm text-pinksoft-700/80">
+                        Pantau skor algoritma dan edit langsung jumlah <strong>Views, Likes, Komentar, & Shares</strong> tiap video
+                    </p>
+                </div>
+                <div class="px-3.5 py-2 rounded-2xl bg-pinksoft-100/90 border border-pinksoft-200 text-[11px] text-pinksoft-800">
+                    <strong>Bonus ER%:</strong> ER ≥ 8% skor ×1.5 (Viral), ER ≥ 4% skor ×1.2
+                </div>
+            </div>
+
+            <!-- Grafik Batang Perbandingan Skor Konten -->
+            <div class="glass-card rounded-3xl p-5 sm:p-6">
+                <h3 class="font-display font-bold text-base text-pinksoft-950 flex items-center gap-2 mb-1">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5 text-pinksoft-500"></i>
+                    Grafik Peringkat Skor Algoritma
+                </h3>
+                <p class="text-xs text-pinksoft-700/75 mb-4">Rumus Skor: (Likes × 1) + (Komentar × 3) + (Shares × 5) × Pengali Bonus ER%</p>
+                <div id="analytics-chart-container" class="space-y-3">
+                    <!-- Bar chart di-render di sini -->
+                </div>
+            </div>
+
+            <!-- Tabel / Kartu Penilaian Semua Konten (Bisa Langsung Edit Like, Komen, View) -->
+            <div class="glass-card rounded-3xl p-5 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-display font-bold text-base text-pinksoft-950 flex items-center gap-2">
+                        <i data-lucide="sliders-horizontal" class="w-5 h-5 text-pinksoft-500"></i>
+                        Data Penilaian Tiap Video (Klik Edit untuk Ubah Angka)
+                    </h3>
+                </div>
+                <div id="analytics-edit-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Kartu edit angka view, like, komen di-render di sini -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL 1: Tambah / Edit Konten -->
+    <div id="content-modal" class="fixed inset-0 z-40 hidden bg-pinksoft-950/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-pinksoft-200 my-8">
+            <div class="flex items-center justify-between pb-3 border-b border-pinksoft-100">
+                <h3 id="modal-title" class="font-display font-extrabold text-lg text-pinksoft-900 flex items-center gap-2">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-pinksoft-500"></i>
+                    Tambah Ide & Jadwal Konten
+                </h3>
+                <button onclick="closeContentModal()" class="p-1.5 rounded-xl text-pinksoft-500 hover:bg-pinksoft-100 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="content-form" onsubmit="saveContent(event)" class="mt-4 space-y-4">
+                <input type="hidden" id="content-id">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold text-pinksoft-800 mb-1">Judul / Ide Konten *</label>
+                        <input type="text" id="field-title" required placeholder="Contoh: Cek Sound System Line Array Sebelum Acara Pernikahan" class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50/70 border border-pinksoft-200 text-sm focus:outline-none focus:border-pinksoft-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-pinksoft-800 mb-1">Platform Utama *</label>
+                        <select id="field-platform" onchange="suggestPrimeTimeForPlatform()" class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50/70 border border-pinksoft-200 text-sm focus:outline-none focus:border-pinksoft-500">
+                            <option value="Instagram">Instagram Reels</option>
+                            <option value="TikTok">TikTok</option>
+                            <option value="Facebook">Facebook Reels / Video</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-pinksoft-800 mb-1">Kategori / Niche</label>
+                        <select id="field-category" class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50/70 border border-pinksoft-200 text-sm focus:outline-none focus:border-pinksoft-500">
+                            <option value="Behind The Scenes">Behind The Scenes (BTS)</option>
+                            <option value="Sound System & Lighting">Sound System & Lighting</option>
+                            <option value="Event Production">Event Production / Setup</option>
+                            <option value="Daily Vlog Crew">Daily Vlog Crew</option>
+                            <option value="Tips & Edukasi">Tips & Edukasi</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-pinksoft-800 mb-1">Status Workflow *</label>
+                        <select id="field-status" class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50/70 border border-pinksoft-200 text-sm focus:outline-none focus:border-pinksoft-500">
+                            <option value="IDE">💡 Ide Konten</option>
+                            <option value="EDITING">✂️ Sedang Proses Edit</option>
+                            <option value="SCHEDULED">⏰ Siap Tayang (Terjadwal)</option>
+                            <option value="POSTED">✅ Sudah Tayang</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-pinksoft-800 mb-1">Jadwal Tayang (Tanggal & Jam Post)</label>
+                        <input type="datetime-local" id="field-datetime" class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50/70 border border-pinksoft-200 text-sm focus:outline-none focus:border-pinksoft-500">
+                        <p id="prime-hint" class="text-[11px] text-pinksoft-600 mt-1">Prime time IG: 12:15 atau 19:00 WIB</p>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold text-pinksoft-800 mb-1">
+                            Link Contoh Konten / Video Referensi (Bisa Langsung Diputar!)
+                        </label>
+                        <input type="url" id="field-video-url" placeholder="Tempel link YouTube/Shorts, TikTok, Instagram Reel, atau link .mp4" class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50/70 border border-pinksoft-200 text-sm focus:outline-none focus:border-pinksoft-500">
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold text-pinksoft-800 mb-1">Catatan Konsep, Hook 3 Detik Pertama & Audio</label>
+                        <textarea id="field-notes" rows="3" placeholder="Tulis hook pembuka agar penonton tidak skip, transisi edit, atau lagu trending yang dipakai..." class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50/70 border border-pinksoft-200 text-sm focus:outline-none focus:border-pinksoft-500"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-pinksoft-100">
+                    <button type="button" onclick="closeContentModal()" class="px-4 py-2.5 rounded-xl bg-pinksoft-100 text-pinksoft-700 font-semibold text-xs sm:text-sm hover:bg-pinksoft-200 transition">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl pink-gradient-btn text-white font-semibold text-xs sm:text-sm shadow-md">Simpan Konten</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Input / Edit Penilaian Konten (Views, Likes, Komen, Shares) -->
+    <div id="analytics-modal" class="fixed inset-0 z-40 hidden bg-pinksoft-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-pinksoft-200">
+            <div class="flex items-center justify-between pb-3 border-b border-pinksoft-100">
+                <div>
+                    <h3 class="font-display font-extrabold text-lg text-pinksoft-900 flex items-center gap-2">
+                        <i data-lucide="trending-up" class="w-5 h-5 text-pinksoft-500"></i>
+                        Edit Penilaian & Statistik Konten
+                    </h3>
+                    <p id="eval-content-title" class="text-xs text-pinksoft-600 mt-0.5 line-clamp-1">Judul Konten</p>
+                </div>
+                <button onclick="closeAnalyticsModal()" class="p-1.5 rounded-xl text-pinksoft-500 hover:bg-pinksoft-100 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="analytics-form" onsubmit="saveAnalytics(event)" class="mt-4 space-y-4">
+                <input type="hidden" id="eval-id">
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-pinksoft-800 mb-1">Total Views 👁️</label>
+                        <input type="number" id="eval-views" min="0" required oninput="previewAlgorithmScore()" class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50 border border-pinksoft-200 text-sm font-semibold focus:outline-none focus:border-pinksoft-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-pinksoft-800 mb-1">Jumlah Likes ❤️</label>
+                        <input type="number" id="eval-likes" min="0" required oninput="previewAlgorithmScore()" class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50 border border-pinksoft-200 text-sm font-semibold focus:outline-none focus:border-pinksoft-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-pinksoft-800 mb-1">Jumlah Komentar 💬</label>
+                        <input type="number" id="eval-comments" min="0" required oninput="previewAlgorithmScore()" class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50 border border-pinksoft-200 text-sm font-semibold focus:outline-none focus:border-pinksoft-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-pinksoft-800 mb-1">Jumlah Shares 🚀</label>
+                        <input type="number" id="eval-shares" min="0" required oninput="previewAlgorithmScore()" class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50 border border-pinksoft-200 text-sm font-semibold focus:outline-none focus:border-pinksoft-500">
+                    </div>
+                </div>
+
+                <!-- Live Preview Skor Algoritma -->
+                <div class="p-4 rounded-2xl bg-pinksoft-50 border border-pinksoft-200 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-pinksoft-800">Skor Algoritma:</span>
+                        <span id="preview-algo-score" class="font-display font-extrabold text-lg text-pinksoft-600">0 Poin</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-pinksoft-800">Engagement Rate (ER%):</span>
+                        <span id="preview-er" class="font-bold text-xs px-2.5 py-0.5 rounded-full bg-white text-emerald-600 border border-emerald-200">0%</span>
+                    </div>
+                    <div class="pt-1 border-t border-pinksoft-200/60 flex items-center justify-between">
+                        <span class="text-xs text-pinksoft-700">Status Performa:</span>
+                        <span id="preview-verdict" class="text-xs font-extrabold text-pinksoft-700">-</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeAnalyticsModal()" class="px-4 py-2.5 rounded-xl bg-pinksoft-100 text-pinksoft-700 font-semibold text-xs">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl pink-gradient-btn text-white font-semibold text-xs shadow-md">Simpan Penilaian</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Tambah / Edit Rekomendasi Konten Viral -->
+    <div id="viral-modal" class="fixed inset-0 z-40 hidden bg-pinksoft-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-pinksoft-200">
+            <div class="flex items-center justify-between pb-3 border-b border-pinksoft-100">
+                <h3 id="viral-modal-title" class="font-display font-extrabold text-lg text-pinksoft-900 flex items-center gap-2">
+                    <i data-lucide="flame" class="w-5 h-5 text-pinksoft-500"></i>
+                    Edit Ide Konten Viral
+                </h3>
+                <button onclick="closeViralModal()" class="p-1.5 rounded-xl text-pinksoft-500 hover:bg-pinksoft-100 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form onsubmit="saveViralItem(event)" class="mt-4 space-y-3.5">
+                <input type="hidden" id="viral-id">
+                <div>
+                    <label class="block text-xs font-bold text-pinksoft-800 mb-1">Judul Ide Viral *</label>
+                    <input type="text" id="viral-title" required placeholder="Contoh: POV Cek Sound H-1 Acara..." class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50 border border-pinksoft-200 text-sm focus:outline-none focus:border-pinksoft-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-pinksoft-800 mb-1">Target Platform / Trend</label>
+                    <input type="text" id="viral-platform" placeholder="Contoh: TikTok & IG Reels" class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50 border border-pinksoft-200 text-sm focus:outline-none focus:border-pinksoft-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-pinksoft-800 mb-1">Konsep & Hook Video *</label>
+                    <textarea id="viral-desc" rows="3" required placeholder="Jelaskan konsep video, audio trending, atau hook 3 detik pertama..." class="w-full px-3.5 py-2.5 rounded-xl bg-pinksoft-50 border border-pinksoft-200 text-sm focus:outline-none focus:border-pinksoft-500"></textarea>
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeViralModal()" class="px-4 py-2.5 rounded-xl bg-pinksoft-100 text-pinksoft-700 font-semibold text-xs">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl pink-gradient-btn text-white font-semibold text-xs shadow-md">Simpan Ide Viral</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. KONFIGURASI PRIME TIME (5 VIDEO / MINGGU)
+        // ==========================================
+        const PRIME_TIME_SLOTS = [
+            { dayName: 'Senin', time: '19:30', platform: 'TikTok' },
+            { dayName: 'Rabu', time: '12:15', platform: 'Instagram' },
+            { dayName: 'Jumat', time: '20:00', platform: 'TikTok' },
+            { dayName: 'Sabtu', time: '16:30', platform: 'Facebook' },
+            { dayName: 'Minggu', time: '19:00', platform: 'Instagram' }
+        ];
+
+        // ==========================================
+        // 2. DATA DEFAULT & LOCAL STORAGE
+        // ==========================================
+        const STORAGE_KEY = 'pinkglow_content_planner_v2';
+        const VIRAL_STORAGE_KEY = 'pinkglow_viral_list_v2';
+
+        const DEFAULT_VIRAL_LIST = [
+            {
+                id: 'vir-1',
+                title: 'POV: Persiapan Cek Sound & Lighting H-1 Hajatan',
+                platform: 'TikTok & IG Reels',
+                desc: 'Rekam proses bongkar muat alat dari truk sampai lampu sorot nyala pertama kali dengan transisi beat musik jedag-jedug.'
+            },
+            {
+                id: 'vir-2',
+                title: 'Sebelum vs Sesudah Ruangan Gelap Jadi Pesta Mewah',
+                platform: 'Instagram Reels',
+                desc: 'Gunakan transisi jentikan jari atau hentakan bass saat lampu sorot panggung langsung menyala serentak.'
+            },
+            {
+                id: 'vir-3',
+                title: 'ASMR Suara Cek Mic & Hentakan Bass Subwoofer',
+                platform: 'TikTok',
+                desc: 'Tanpa musik latar, fokus ke kejernihan suara audio dan getaran bass agar audiens sesama vendor ikut berkomentar.'
+            }
+        ];
+
+        const DEFAULT_CONTENTS = [
+            {
+                id: 'cnt-101',
+                title: 'Cek Sound Bass Sub 18 Inch Sebelum Acara Nikahan',
+                platform: 'TikTok',
+                category: 'Sound System & Lighting',
+                status: 'POSTED',
+                scheduledAt: '2026-11-10T19:30',
+                videoUrl: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+                notes: 'Hook 3 detik pertama langsung suara dentuman bass + teks "Test sound jam 2 pagi bikin warga bangun!".',
+                analytics: {
+                    views: 14500,
+                    likes: 1280,
+                    comments: 142,
+                    shares: 45
+                }
+            },
+            {
+                id: 'cnt-102',
+                title: 'Timelapse Pasang Rigging & Lighting Panggung Indoor',
+                platform: 'Instagram',
+                category: 'Event Production',
+                status: 'POSTED',
+                scheduledAt: '2026-11-12T12:15',
+                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+                notes: 'Pakai transisi cepat dari panggung kosong sampai lampu beam nyala penuh.',
+                analytics: {
+                    views: 8200,
+                    likes: 540,
+                    comments: 38,
+                    shares: 29
+                }
+            },
+            {
+                id: 'cnt-103',
+                title: '3 Kesalahan Fatal Pasang Kabel Audio Biar Gak Dengung',
+                platform: 'Facebook',
+                category: 'Tips & Edukasi',
+                status: 'SCHEDULED',
+                scheduledAt: '2026-11-21T16:30',
+                videoUrl: 'https://www.youtube.com/shorts/5qap5aO4i9A',
+                notes: 'Edukasi singkat sambil nunjukin kabel XLR dan manajemen kelistrikan genset.',
+                analytics: null
+            },
+            {
+                id: 'cnt-104',
+                title: 'Behind The Scenes Crew Loading Alat Hujan-Hujanan',
+                platform: 'TikTok',
+                category: 'Daily Vlog Crew',
+                status: 'EDITING',
+                scheduledAt: '2026-11-20T20:00',
+                videoUrl: '',
+                notes: 'Tambahkan subtitle estetik dan audio galau tapi semangat kerja keras.',
+                analytics: null
+            },
+            {
+                id: 'cnt-105',
+                title: 'Before vs After Dekorasi Lighting Pesta Malam',
+                platform: 'Instagram',
+                category: 'Behind The Scenes',
+                status: 'IDE',
+                scheduledAt: '2026-11-22T19:00',
+                videoUrl: '',
+                notes: 'Rekam kondisi ruangan sebelum lampu sorot dinyalakan vs saat acara puncak.',
+                analytics: null
+            }
+        ];
+
+        let contents = [];
+        let viralList = [];
+        let currentPage = 'home';
+        let currentFilterStatus = 'ALL';
+
+        function loadData() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                contents = saved ? JSON.parse(saved) : [...DEFAULT_CONTENTS];
+                if (!saved) saveData();
+
+                const savedViral = localStorage.getItem(VIRAL_STORAGE_KEY);
+                viralList = savedViral ? JSON.parse(savedViral) : [...DEFAULT_VIRAL_LIST];
+                if (!savedViral) saveViralData();
+            } catch (err) {
+                console.error('Gagal memuat data:', err);
+                contents = [...DEFAULT_CONTENTS];
+                viralList = [...DEFAULT_VIRAL_LIST];
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(contents));
+            } catch (err) {
+                console.error('Gagal menyimpan data:', err);
+            }
+        }
+
+        function saveViralData() {
+            try {
+                localStorage.setItem(VIRAL_STORAGE_KEY, JSON.stringify(viralList));
+            } catch (err) {
+                console.error('Gagal menyimpan ide viral:', err);
+            }
+        }
+
+        // ==========================================
+        // 3. NAVIGASI ANTAR 4 MENU TERPISAH
+        // ==========================================
+        function switchPage(pageName) {
+            currentPage = pageName;
+            const pages = ['home', 'calendar', 'recommendations', 'chart'];
+
+            pages.forEach(p => {
+                const section = document.getElementById(`page-${p}`);
+                if (section) {
+                    if (p === pageName) {
+                        section.classList.remove('hidden');
+                    } else {
+                        section.classList.add('hidden');
+                    }
+                }
+            });
+
+            // Highlight tombol navigasi aktif (Desktop & Mobile)
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const isDesktop = btn.closest('header') !== null;
+                if (btn.dataset.nav === pageName) {
+                    if (isDesktop) {
+                        btn.className = 'nav-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition bg-pinksoft-500 text-white shadow-xs';
+                    } else {
+                        btn.className = 'nav-btn flex-1 py-1.5 rounded-xl flex flex-col items-center gap-1 text-[11px] font-bold transition text-pinksoft-600 bg-pinksoft-100';
+                    }
+                } else {
+                    if (isDesktop) {
+                        btn.className = 'nav-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition text-pinksoft-800 hover:bg-pinksoft-200/60';
+                    } else {
+                        btn.className = 'nav-btn flex-1 py-1.5 rounded-xl flex flex-col items-center gap-1 text-[11px] font-bold transition text-pinksoft-700/75';
+                    }
+                }
+            });
+
+            renderAll();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToCalendarWithFilter(status) {
+            switchPage('calendar');
+            setFilterStatus(status);
+        }
+
+        // ==========================================
+        // 4. ALGORITMA SKOR & ENGAGEMENT RATE (ER%)
+        // ==========================================
+        function calculateAlgorithmMetrics(analytics) {
+            if (!analytics) return { score: 0, er: 0, verdict: 'Belum Dinilai', badgeClass: 'bg-pinksoft-100 text-pinksoft-700' };
+
+            const views = Number(analytics.views) || 0;
+            const likes = Number(analytics.likes) || 0;
+            const comments = Number(analytics.comments) || 0;
+            const shares = Number(analytics.shares) || 0;
+
+            const totalInteractions = likes + comments + shares;
+            const er = views > 0 ? Number(((totalInteractions / views) * 100).toFixed(2)) : 0;
+
+            const rawPoints = (likes * 1) + (comments * 3) + (shares * 5);
+            let multiplier = 1.0;
+            if (er >= 8) {
+                multiplier = 1.5;
+            } else if (er >= 4) {
+                multiplier = 1.2;
+            }
+
+            const score = Math.round(rawPoints * multiplier);
+
+            let verdict = 'Perlu Hook Lebih Kuat';
+            let badgeClass = 'bg-amber-100 text-amber-700';
+            if (er >= 8 || score >= 1500) {
+                verdict = '🔥 Viral / Rame Banget!';
+                badgeClass = 'bg-emerald-100 text-emerald-700';
+            } else if (er >= 4 || score >= 600) {
+                verdict = '✨ Stabil & Bagus';
+                badgeClass = 'bg-pinksoft-100 text-pinksoft-700';
+            }
+
+            return { score, er, verdict, badgeClass };
+        }
+
+        // ==========================================
+        // 5. EMBEDDED VIDEO PLAYER PARSER
+        // ==========================================
+        function renderVideoPlayer(url) {
+            if (!url || !url.trim()) return '';
+            const cleanUrl = url.trim();
+
+            try {
+                const ytMatch = cleanUrl.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+                if (ytMatch && ytMatch[1]) {
+                    return `
+                        <div class="video-container aspect-video mt-3 shadow-inner border border-pinksoft-200">
+                            <iframe src="https://www.youtube.com/embed/${ytMatch[1]}" title="YouTube Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                        </div>
+                    `;
+                }
+
+                const ttMatch = cleanUrl.match(/tiktok\.com\/@[^\/]+\/video\/(\d+)/) || cleanUrl.match(/tiktok\.com\/.*\/video\/(\d+)/);
+                if (ttMatch && ttMatch[1]) {
+                    return `
+                        <div class="video-container h-80 mt-3 shadow-inner border border-pinksoft-200">
+                            <iframe src="https://www.tiktok.com/embed/v2/${ttMatch[1]}" title="TikTok Video" allowfullscreen loading="lazy"></iframe>
+                        </div>
+                    `;
+                }
+
+                const igMatch = cleanUrl.match(/instagram\.com\/(?:reel|p|tv)\/([a-zA-Z0-9_-]+)/);
+                if (igMatch && igMatch[1]) {
+                    return `
+                        <div class="video-container h-80 mt-3 shadow-inner border border-pinksoft-200 bg-white">
+                            <iframe src="https://www.instagram.com/p/${igMatch[1]}/embed" title="Instagram Video" allowfullscreen loading="lazy"></iframe>
+                        </div>
+                    `;
+                }
+
+                if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(cleanUrl)) {
+                    return `
+                        <div class="video-container aspect-video mt-3 shadow-inner border border-pinksoft-200">
+                            <video controls preload="metadata" class="w-full h-full object-cover">
+                                <source src="${cleanUrl}" type="video/mp4">
+                            </video>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error('Error parsing video URL:', err);
+            }
+
+            return `
+                <div class="mt-3 p-2.5 rounded-xl bg-pinksoft-50 border border-pinksoft-200 flex items-center justify-between gap-2">
+                    <span class="text-[11px] text-pinksoft-700 truncate flex items-center gap-1.5">
+                        <i data-lucide="play-circle" class="w-4 h-4 text-pinksoft-500 shrink-0"></i>
+                        <span class="truncate">${cleanUrl}</span>
+                    </span>
+                    <a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-pinksoft-500 text-white text-[11px] font-bold shrink-0 hover:bg-pinksoft-600 transition">Buka Video</a>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // 6. RENDER HALAMAN 1: MENU UTAMA
+        // ==========================================
+        function renderHomePage() {
+            const countIde = contents.filter(c => c.status === 'IDE').length;
+            const countEditing = contents.filter(c => c.status === 'EDITING').length;
+            const countScheduled = contents.filter(c => c.status === 'SCHEDULED').length;
+            const countPosted = contents.filter(c => c.status === 'POSTED').length;
+
+            document.getElementById('stat-ide').textContent = countIde;
+            document.getElementById('stat-editing').textContent = countEditing;
+            document.getElementById('stat-scheduled').textContent = countScheduled;
+            document.getElementById('stat-posted').textContent = countPosted;
+
+            const readyOrPosted = countScheduled + countPosted;
+            const pct = Math.min(100, Math.round((readyOrPosted / 5) * 100));
+            document.getElementById('weekly-progress-text').textContent = `${readyOrPosted} / 5 Video`;
+            document.getElementById('weekly-progress-bar').style.width = `${pct}%`;
+
+            const evaluated = contents
+                .filter(c => c.analytics && (c.analytics.views > 0 || c.analytics.likes > 0))
+                .map(c => ({ ...c, metrics: calculateAlgorithmMetrics(c.analytics) }))
+                .sort((a, b) => b.metrics.score - a.metrics.score);
+
+            if (evaluated.length > 0) {
+                const best = evaluated[0];
+                document.getElementById('best-title').textContent = best.title;
+                document.getElementById('best-platform-badge').textContent = `${best.platform} • ${best.category}`;
+                document.getElementById('best-insight').textContent = `Meraih status ${best.metrics.verdict} dengan ${best.analytics.views.toLocaleString('id-ID')} views. Buat seri lanjutan dari topik "${best.category}"!`;
+                document.getElementById('best-score').textContent = best.metrics.score.toLocaleString('id-ID');
+                document.getElementById('best-er').textContent = `${best.metrics.er}%`;
+                document.getElementById('best-likes').textContent = best.analytics.likes.toLocaleString('id-ID');
+                document.getElementById('best-comments').textContent = best.analytics.comments.toLocaleString('id-ID');
+            } else {
+                document.getElementById('best-title').textContent = 'Belum ada data evaluasi';
+                document.getElementById('best-platform-badge').textContent = '-';
+                document.getElementById('best-insight').textContent = 'Input statistik Views, Likes, dan Komentar pada menu Grafik Konten untuk mengetahui video paling rame.';
+                document.getElementById('best-score').textContent = '0';
+                document.getElementById('best-er').textContent = '0%';
+                document.getElementById('best-likes').textContent = '0';
+                document.getElementById('best-comments').textContent = '0';
+            }
+        }
+
+        // ==========================================
+        // 7. RENDER HALAMAN 2: KALENDER & PENGEDITAN
+        // ==========================================
+        function formatScheduleDate(dtString) {
+            if (!dtString) return 'Belum dijadwalkan';
+            try {
+                const date = new Date(dtString);
+                if (isNaN(date.getTime())) return dtString;
+                return date.toLocaleDateString('id-ID', {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) + ' WIB';
+            } catch (e) {
+                return dtString;
+            }
+        }
+
+        function renderContentGrid() {
+            const grid = document.getElementById('content-grid');
+            const platformFilter = document.getElementById('platform-filter').value;
+            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+
+            const filtered = contents.filter(item => {
+                const matchStatus = currentFilterStatus === 'ALL' || item.status === currentFilterStatus;
+                const matchPlatform = platformFilter === 'ALL' || item.platform === platformFilter;
+                const matchSearch = !searchQuery ||
+                    item.title.toLowerCase().includes(searchQuery) ||
+                    (item.notes && item.notes.toLowerCase().includes(searchQuery)) ||
+                    (item.category && item.category.toLowerCase().includes(searchQuery));
+                return matchStatus && matchPlatform && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full glass-card rounded-3xl p-10 text-center">
+                        <div class="w-12 h-12 rounded-2xl bg-pinksoft-100 text-pinksoft-500 flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="folder-heart" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-display font-bold text-base text-pinksoft-900">Belum ada konten di filter ini</h4>
+                        <p class="text-xs text-pinksoft-700/75 mt-1">Klik tombol "Tambah Konten Baru" untuk membuat jadwal konten.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const statusBadges = {
+                IDE: { label: '💡 Ide Konten', cls: 'bg-pinksoft-100 text-pinksoft-700 border-pinksoft-200' },
+                EDITING: { label: '✂️ Proses Edit', cls: 'bg-amber-100 text-amber-700 border-amber-200' },
+                SCHEDULED: { label: '⏰ Siap Tayang', cls: 'bg-purple-100 text-purple-700 border-purple-200' },
+                POSTED: { label: '✅ Sudah Tayang', cls: 'bg-emerald-100 text-emerald-700 border-emerald-200' }
+            };
+
+            const platformColors = {
+                TikTok: 'bg-slate-900 text-white',
+                Instagram: 'bg-gradient-to-r from-pink-500 to-rose-500 text-white',
+                Facebook: 'bg-blue-600 text-white'
+            };
+
+            grid.innerHTML = filtered.map(item => {
+                const st = statusBadges[item.status] || statusBadges.IDE;
+                const plCls = platformColors[item.platform] || 'bg-pinksoft-600 text-white';
+
+                return `
+                    <article class="glass-card rounded-3xl p-5 flex flex-col justify-between hover:border-pinksoft-400 transition duration-200">
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-3">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold ${plCls}">${item.platform}</span>
+                                    <span class="px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${st.cls}">${st.label}</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <button onclick="openContentModal('${item.id}')" class="p-1.5 rounded-xl text-pinksoft-600 hover:bg-pinksoft-100 transition" title="Edit Konten">
+                                        <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                    </button>
+                                    <button onclick="deleteContent('${item.id}')" class="p-1.5 rounded-xl text-rose-500 hover:bg-rose-50 transition" title="Hapus Konten">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <span class="text-[11px] font-semibold text-pinksoft-500 uppercase tracking-wide">${item.category || 'Konten Umum'}</span>
+                            <h3 class="font-display font-bold text-base text-pinksoft-950 mt-0.5 leading-snug">${item.title}</h3>
+
+                            <div class="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-pinksoft-50 border border-pinksoft-200/80 text-xs font-medium text-pinksoft-800">
+                                <i data-lucide="calendar-clock" class="w-3.5 h-3.5 text-pinksoft-500"></i>
+                                <span>${formatScheduleDate(item.scheduledAt)}</span>
+                            </div>
+
+                            ${renderVideoPlayer(item.videoUrl)}
+
+                            ${item.notes ? `
+                                <p class="mt-3 text-xs text-pinksoft-800/85 bg-white/75 p-3 rounded-2xl border border-pinksoft-100 leading-relaxed">
+                                    ${item.notes}
+                                </p>
+                            ` : ''}
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-pinksoft-200/70 flex items-center justify-between gap-2">
+                            <select onchange="quickChangeStatus('${item.id}', this.value)" class="px-2.5 py-1.5 rounded-xl bg-pinksoft-50 border border-pinksoft-200 text-xs font-semibold text-pinksoft-800 focus:outline-none">
+                                <option value="IDE" ${item.status === 'IDE' ? 'selected' : ''}>Status: Ide</option>
+                                <option value="EDITING" ${item.status === 'EDITING' ? 'selected' : ''}>Status: Editing</option>
+                                <option value="SCHEDULED" ${item.status === 'SCHEDULED' ? 'selected' : ''}>Status: Siap Tayang</option>
+                                <option value="POSTED" ${item.status === 'POSTED' ? 'selected' : ''}>Status: Sudah Tayang</option>
+                            </select>
+
+                            <button onclick="openContentModal('${item.id}')" class="px-3 py-1.5 rounded-xl bg-pinksoft-100 hover:bg-pinksoft-200 text-pinksoft-700 text-xs font-bold flex items-center gap-1.5 transition">
+                                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                <span>Edit Detail</span>
+                            </button>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // 8. RENDER HALAMAN 3: REKOMENDASI VIRAL
+        // ==========================================
+        function renderRecommendationsPage() {
+            const recContainer = document.getElementById('algorithm-recommendations');
+            const viralGrid = document.getElementById('viral-list-grid');
+
+            const evaluated = contents
+                .filter(c => c.analytics)
+                .map(c => ({ ...c, metrics: calculateAlgorithmMetrics(c.analytics) }))
+                .sort((a, b) => b.metrics.score - a.metrics.score);
+
+            if (evaluated.length > 0) {
+                const topItem = evaluated[0];
+                const platformTotals = {};
+                evaluated.forEach(item => {
+                    platformTotals[item.platform] = (platformTotals[item.platform] || 0) + (item.analytics.comments || 0);
+                });
+                const bestPlatformEntry = Object.entries(platformTotals).sort((a, b) => b[1] - a[1])[0];
+
+                recContainer.innerHTML = `
+                    <div class="p-4 rounded-2xl bg-pinksoft-50/90 border border-pinksoft-200">
+                        <div class="font-bold text-pinksoft-950 text-sm">🏆 Topik Paling Rame: ${topItem.category}</div>
+                        <p class="text-xs text-pinksoft-800/90 mt-1 leading-relaxed">
+                            Konten "<strong>${topItem.title}</strong>" meraih Engagement Rate <strong>${topItem.metrics.er}%</strong>. Buat Part 2 atau sudut pandang baru dari topik ini!
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-pinksoft-50/90 border border-pinksoft-200">
+                        <div class="font-bold text-pinksoft-950 text-sm">🚀 Platform Paling Interaktif: ${bestPlatformEntry[0]}</div>
+                        <p class="text-xs text-pinksoft-800/90 mt-1 leading-relaxed">
+                            Audiens paling aktif berkomentar (<strong>${bestPlatformEntry[1]} komen</strong>) di ${bestPlatformEntry[0]}. Gunakan hook pertanyaan di akhir video.
+                        </p>
+                    </div>
+                `;
+            } else {
+                recContainer.innerHTML = `
+                    <div class="col-span-full p-4 rounded-2xl bg-pinksoft-50 border border-pinksoft-200 text-pinksoft-800">
+                        💡 Isi penilaian Like & Komentar di menu <strong>Grafik Konten</strong> untuk mendapatkan saran topik otomatis dari algoritma.
+                    </div>
+                `;
+            }
+
+            if (viralList.length === 0) {
+                viralGrid.innerHTML = `
+                    <div class="col-span-full glass-card rounded-3xl p-8 text-center">
+                        <p class="text-xs font-semibold text-pinksoft-700">Belum ada daftar ide viral. Klik "Tambah Ide Viral Baru" di kanan atas.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            viralGrid.innerHTML = viralList.map(v => `
+                <article class="glass-card rounded-3xl p-5 flex flex-col justify-between hover:border-pinksoft-400 transition">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-2.5">
+                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-pinksoft-500 text-white">🔥 ${v.platform}</span>
+                            <div class="flex items-center gap-1">
+                                <button onclick="openViralModal('${v.id}')" class="p-1.5 rounded-xl text-pinksoft-600 hover:bg-pinksoft-100 transition" title="Edit Ide Viral">
+                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="deleteViralItem('${v.id}')" class="p-1.5 rounded-xl text-rose-500 hover:bg-rose-50 transition" title="Hapus">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <h4 class="font-display font-bold text-base text-pinksoft-950 leading-snug">${v.title}</h4>
+                        <p class="text-xs text-pinksoft-800/85 mt-2 leading-relaxed bg-pinksoft-50/70 p-3 rounded-2xl border border-pinksoft-100">
+                            ${v.desc}
+                        </p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-pinksoft-200/70 flex items-center justify-between">
+                        <button onclick="openViralModal('${v.id}')" class="text-xs font-bold text-pinksoft-600 hover:text-pinksoft-800 flex items-center gap-1">
+                            <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Edit Ide
+                        </button>
+                        <button onclick="useViralIdeaToCalendar('${v.id}')" class="px-3 py-1.5 rounded-xl pink-gradient-btn text-white text-xs font-bold flex items-center gap-1 shadow-xs">
+                            <i data-lucide="calendar-plus" class="w-3.5 h-3.5"></i> Jadwalkan
+                        </button>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // ==========================================
+        // 9. RENDER HALAMAN 4: GRAFIK & PENILAIAN KONTEN
+        // ==========================================
+        function renderChartPage() {
+            const chartContainer = document.getElementById('analytics-chart-container');
+            const editListContainer = document.getElementById('analytics-edit-list');
+
+            const evaluated = contents
+                .filter(c => c.analytics)
+                .map(c => ({ ...c, metrics: calculateAlgorithmMetrics(c.analytics) }))
+                .sort((a, b) => b.metrics.score - a.metrics.score);
+
+            if (evaluated.length === 0) {
+                chartContainer.innerHTML = `
+                    <div class="p-6 text-center rounded-2xl bg-pinksoft-50/70 border border-dashed border-pinksoft-300">
+                        <p class="text-xs font-semibold text-pinksoft-700">Belum ada data penilaian video.</p>
+                        <p class="text-[11px] text-pinksoft-600 mt-1">Klik tombol "Edit Like, Komen & View" pada daftar video di bawah ini.</p>
+                    </div>
+                `;
+            } else {
+                const maxScore = Math.max(...evaluated.map(e => e.metrics.score), 100);
+                chartContainer.innerHTML = evaluated.map((item, idx) => {
+                    const barWidth = Math.max(8, Math.round((item.metrics.score / maxScore) * 100));
+                    return `
+                        <div class="p-3.5 rounded-2xl bg-pinksoft-50/80 border border-pinksoft-200/80 space-y-2">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-bold text-xs sm:text-sm text-pinksoft-950 truncate">#${idx + 1} • ${item.title}</span>
+                                <span class="text-xs font-extrabold text-pinksoft-600 shrink-0">${item.metrics.score.toLocaleString('id-ID')} Poin</span>
+                            </div>
+                            <div class="w-full h-3 bg-pinksoft-200/70 rounded-full overflow-hidden">
+                                <div class="h-full pink-gradient-btn rounded-full transition-all duration-500" style="width: ${barWidth}%"></div>
+                            </div>
+                            <div class="flex flex-wrap items-center justify-between text-[11px] text-pinksoft-700 gap-2">
+                                <span>${item.platform} • 👁️ Views: <strong>${item.analytics.views.toLocaleString('id-ID')}</strong></span>
+                                <span>❤️ ${item.analytics.likes.toLocaleString('id-ID')} • 💬 ${item.analytics.comments.toLocaleString('id-ID')} • 🚀 ${item.analytics.shares || 0} • ER: <strong class="text-emerald-600">${item.metrics.er}%</strong></span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Daftar semua konten agar pengguna bisa langsung edit Like, Komen, View kapan saja
+            editListContainer.innerHTML = contents.map(item => {
+                const hasStats = item.analytics !== null;
+                const metrics = hasStats ? calculateAlgorithmMetrics(item.analytics) : null;
+
+                return `
+                    <div class="p-4 rounded-2xl bg-pinksoft-50/60 border border-pinksoft-200 flex flex-col justify-between gap-3">
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-1">
+                                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-lg bg-pinksoft-200/80 text-pinksoft-800">${item.platform}</span>
+                                <span class="text-[11px] font-bold ${hasStats ? 'text-emerald-600' : 'text-pinksoft-500'}">
+                                    ${hasStats ? `${metrics.verdict} (ER ${metrics.er}%)` : 'Belum dinilai'}
+                                </span>
+                            </div>
+                            <h4 class="font-display font-bold text-sm text-pinksoft-950 line-clamp-1">${item.title}</h4>
+
+                            <div class="grid grid-cols-4 gap-2 mt-3 text-center">
+                                <div class="bg-white rounded-xl p-2 border border-pinksoft-100">
+                                    <div class="text-[10px] text-pinksoft-600">Views</div>
+                                    <div class="font-bold text-xs text-pinksoft-950">${hasStats ? item.analytics.views.toLocaleString('id-ID') : '-'}</div>
+                                </div>
+                                <div class="bg-white rounded-xl p-2 border border-pinksoft-100">
+                                    <div class="text-[10px] text-pinksoft-600">Likes</div>
+                                    <div class="font-bold text-xs text-pinksoft-950">${hasStats ? item.analytics.likes.toLocaleString('id-ID') : '-'}</div>
+                                </div>
+                                <div class="bg-white rounded-xl p-2 border border-pinksoft-100">
+                                    <div class="text-[10px] text-pinksoft-600">Komen</div>
+                                    <div class="font-bold text-xs text-pinksoft-950">${hasStats ? item.analytics.comments.toLocaleString('id-ID') : '-'}</div>
+                                </div>
+                                <div class="bg-white rounded-xl p-2 border border-pinksoft-100">
+                                    <div class="text-[10px] text-pinksoft-600">Shares</div>
+                                    <div class="font-bold text-xs text-pinksoft-950">${hasStats ? (item.analytics.shares || 0).toLocaleString('id-ID') : '-'}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="openAnalyticsModal('${item.id}')" class="w-full py-2 rounded-xl pink-gradient-btn text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs">
+                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                            <span>Edit Like, Komen & View</span>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAll() {
+            renderHomePage();
+            renderContentGrid();
+            renderRecommendationsPage();
+            renderChartPage();
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // 10. INTERAKSI MODAL & CRUD
+        // ==========================================
+        function setFilterStatus(status) {
+            currentFilterStatus = status;
+            document.querySelectorAll('.filter-tab').forEach(btn => {
+                if (btn.dataset.filter === status) {
+                    btn.className = 'filter-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-pinksoft-500 text-white shadow-xs transition';
+                } else {
+                    btn.className = 'filter-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-pinksoft-100/80 text-pinksoft-700 hover:bg-pinksoft-200 transition';
+                }
+            });
+            renderContentGrid();
+            lucide.createIcons();
+        }
+
+        function suggestPrimeTimeForPlatform() {
+            const platform = document.getElementById('field-platform').value;
+            const hint = document.getElementById('prime-hint');
+            if (platform === 'TikTok') {
+                hint.textContent = 'Prime time TikTok: 19:30 - 20:30 WIB (Senin & Jumat)';
+            } else if (platform === 'Instagram') {
+                hint.textContent = 'Prime time IG Reels: 12:15 WIB (Rabu) atau 19:00 WIB (Minggu)';
+            } else {
+                hint.textContent = 'Prime time Facebook: 16:30 WIB (Sabtu Sore)';
+            }
+        }
+
+        function openContentModal(editId = null) {
+            const modal = document.getElementById('content-modal');
+            const form = document.getElementById('content-form');
+            form.reset();
+
+            if (editId) {
+                const item = contents.find(c => c.id === editId);
+                if (!item) return;
+                document.getElementById('modal-title').innerHTML = '<i data-lucide="edit-3" class="w-5 h-5 text-pinksoft-500"></i> Edit Ide & Jadwal Konten';
+                document.getElementById('content-id').value = item.id;
+                document.getElementById('field-title').value = item.title;
+                document.getElementById('field-platform').value = item.platform;
+                document.getElementById('field-category').value = item.category || 'Behind The Scenes';
+                document.getElementById('field-status').value = item.status;
+                document.getElementById('field-datetime').value = item.scheduledAt || '';
+                document.getElementById('field-video-url').value = item.videoUrl || '';
+                document.getElementById('field-notes').value = item.notes || '';
+            } else {
+                document.getElementById('modal-title').innerHTML = '<i data-lucide="sparkles" class="w-5 h-5 text-pinksoft-500"></i> Tambah Ide & Jadwal Konten';
+                document.getElementById('content-id').value = '';
+                const now = new Date();
+                now.setDate(now.getDate() + 1);
+                now.setHours(19, 30, 0, 0);
+                const tzOffset = now.getTimezoneOffset() * 60000;
+                document.getElementById('field-datetime').value = new Date(now - tzOffset).toISOString().slice(0, 16);
+            }
+
+            suggestPrimeTimeForPlatform();
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeContentModal() {
+            document.getElementById('content-modal').classList.add('hidden');
+        }
+
+        function saveContent(e) {
+            e.preventDefault();
+            const id = document.getElementById('content-id').value;
+            const payload = {
+                title: document.getElementById('field-title').value.trim(),
+                platform: document.getElementById('field-platform').value,
+                category: document.getElementById('field-category').value,
+                status: document.getElementById('field-status').value,
+                scheduledAt: document.getElementById('field-datetime').value,
+                videoUrl: document.getElementById('field-video-url').value.trim(),
+                notes: document.getElementById('field-notes').value.trim()
+            };
+
+            if (id) {
+                const idx = contents.findIndex(c => c.id === id);
+                if (idx !== -1) {
+                    contents[idx] = { ...contents[idx], ...payload };
+                    showToast('Konten berhasil diperbarui!', 'success');
+                }
+            } else {
+                contents.unshift({
+                    id: 'cnt-' + Date.now(),
+                    ...payload,
+                    analytics: null
+                });
+                showToast('Konten baru ditambahkan ke Kalender!', 'success');
+            }
+
+            saveData();
+            closeContentModal();
+            renderAll();
+        }
+
+        function deleteContent(id) {
+            contents = contents.filter(c => c.id !== id);
+            saveData();
+            renderAll();
+            showToast('Konten berhasil dihapus.', 'info');
+        }
+
+        function quickChangeStatus(id, newStatus) {
+            const item = contents.find(c => c.id === id);
+            if (!item) return;
+            item.status = newStatus;
+            saveData();
+            renderAll();
+            showToast(`Status diubah ke ${newStatus}`, 'success');
+        }
+
+        function autoScheduleWeek() {
+            const unscheduled = contents.filter(c => c.status === 'IDE' || c.status === 'EDITING');
+            if (unscheduled.length === 0) {
+                showToast('Semua ide sudah terjadwal! Tambahkan ide baru terlebih dahulu.', 'info');
+                return;
+            }
+
+            const baseDate = new Date();
+            let assigned = 0;
+
+            unscheduled.slice(0, 5).forEach((item, index) => {
+                const slot = PRIME_TIME_SLOTS[index % PRIME_TIME_SLOTS.length];
+                const targetDate = new Date(baseDate);
+                targetDate.setDate(baseDate.getDate() + index + 1);
+                const [hh, mm] = slot.time.split(':');
+                targetDate.setHours(Number(hh), Number(mm), 0, 0);
+
+                const tzOffset = targetDate.getTimezoneOffset() * 60000;
+                item.scheduledAt = new Date(targetDate - tzOffset).toISOString().slice(0, 16);
+                item.platform = slot.platform;
+                item.status = 'SCHEDULED';
+                assigned++;
+            });
+
+            saveData();
+            renderAll();
+            showToast(`${assigned} konten otomatis dijadwalkan ke jam Prime Time!`, 'success');
+        }
+
+        // Modal Penilaian (Views, Likes, Komen, Shares)
+        function openAnalyticsModal(id) {
+            const item = contents.find(c => c.id === id);
+            if (!item) return;
+
+            document.getElementById('eval-id').value = item.id;
+            document.getElementById('eval-content-title').textContent = item.title;
+            document.getElementById('eval-views').value = item.analytics ? item.analytics.views : 1000;
+            document.getElementById('eval-likes').value = item.analytics ? item.analytics.likes : 80;
+            document.getElementById('eval-comments').value = item.analytics ? item.analytics.comments : 12;
+            document.getElementById('eval-shares').value = item.analytics ? item.analytics.shares : 5;
+
+            previewAlgorithmScore();
+            document.getElementById('analytics-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeAnalyticsModal() {
+            document.getElementById('analytics-modal').classList.add('hidden');
+        }
+
+        function previewAlgorithmScore() {
+            const tempAnalytics = {
+                views: Number(document.getElementById('eval-views').value) || 0,
+                likes: Number(document.getElementById('eval-likes').value) || 0,
+                comments: Number(document.getElementById('eval-comments').value) || 0,
+                shares: Number(document.getElementById('eval-shares').value) || 0
+            };
+
+            const metrics = calculateAlgorithmMetrics(tempAnalytics);
+            document.getElementById('preview-algo-score').textContent = `${metrics.score.toLocaleString('id-ID')} Poin`;
+            document.getElementById('preview-er').textContent = `${metrics.er}%`;
+            document.getElementById('preview-verdict').textContent = metrics.verdict;
+        }
+
+        function saveAnalytics(e) {
+            e.preventDefault();
+            const id = document.getElementById('eval-id').value;
+            const item = contents.find(c => c.id === id);
+            if (!item) return;
+
+            item.analytics = {
+                views: Number(document.getElementById('eval-views').value) || 0,
+                likes: Number(document.getElementById('eval-likes').value) || 0,
+                comments: Number(document.getElementById('eval-comments').value) || 0,
+                shares: Number(document.getElementById('eval-shares').value) || 0
+            };
+            item.status = 'POSTED';
+
+            saveData();
+            closeAnalyticsModal();
+            renderAll();
+            showToast('Statistik Views, Likes & Komen berhasil diperbarui!', 'success');
+        }
+
+        // Modal Rekomendasi Konten Viral
+        function openViralModal(id = null) {
+            const modal = document.getElementById('viral-modal');
+            if (id) {
+                const v = viralList.find(item => item.id === id);
+                if (!v) return;
+                document.getElementById('viral-modal-title').innerHTML = '<i data-lucide="edit-3" class="w-5 h-5 text-pinksoft-500"></i> Edit Ide Konten Viral';
+                document.getElementById('viral-id').value = v.id;
+                document.getElementById('viral-title').value = v.title;
+                document.getElementById('viral-platform').value = v.platform;
+                document.getElementById('viral-desc').value = v.desc;
+            } else {
+                document.getElementById('viral-modal-title').innerHTML = '<i data-lucide="flame" class="w-5 h-5 text-pinksoft-500"></i> Tambah Ide Konten Viral';
+                document.getElementById('viral-id').value = '';
+                document.getElementById('viral-title').value = '';
+                document.getElementById('viral-platform').value = 'TikTok & IG Reels';
+                document.getElementById('viral-desc').value = '';
+            }
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeViralModal() {
+            document.getElementById('viral-modal').classList.add('hidden');
+        }
+
+        function saveViralItem(e) {
+            e.preventDefault();
+            const id = document.getElementById('viral-id').value;
+            const payload = {
+                title: document.getElementById('viral-title').value.trim(),
+                platform: document.getElementById('viral-platform').value.trim() || 'TikTok & IG Reels',
+                desc: document.getElementById('viral-desc').value.trim()
+            };
+
+            if (id) {
+                const idx = viralList.findIndex(v => v.id === id);
+                if (idx !== -1) viralList[idx] = { ...viralList[idx], ...payload };
+                showToast('Ide konten viral diperbarui!', 'success');
+            } else {
+                viralList.unshift({ id: 'vir-' + Date.now(), ...payload });
+                showToast('Ide konten viral baru ditambahkan!', 'success');
+            }
+
+            saveViralData();
+            closeViralModal();
+            renderRecommendationsPage();
+            lucide.createIcons();
+        }
+
+        function deleteViralItem(id) {
+            viralList = viralList.filter(v => v.id !== id);
+            saveViralData();
+            renderRecommendationsPage();
+            lucide.createIcons();
+            showToast('Ide viral dihapus.', 'info');
+        }
+
+        function useViralIdeaToCalendar(id) {
+            const v = viralList.find(item => item.id === id);
+            if (!v) return;
+            switchPage('calendar');
+            openContentModal();
+            document.getElementById('field-title').value = v.title;
+            document.getElementById('field-notes').value = v.desc;
+            if (v.platform.toLowerCase().includes('tiktok')) {
+                document.getElementById('field-platform').value = 'TikTok';
+            } else if (v.platform.toLowerCase().includes('facebook')) {
+                document.getElementById('field-platform').value = 'Facebook';
+            } else {
+                document.getElementById('field-platform').value = 'Instagram';
+            }
+        }
+
+        // Custom Toast Notification
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgClass = type === 'error'
+                ? 'bg-rose-600 text-white'
+                : type === 'info'
+                    ? 'bg-pinksoft-800 text-white'
+                    : 'bg-pinksoft-600 text-white';
+
+            toast.className = `pointer-events-auto px-4 py-3 rounded-2xl shadow-lg text-xs font-semibold flex items-center gap-2 transition-all duration-300 ${bgClass}`;
+            toast.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4 shrink-0"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-8px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            switchPage('home');
+        });
+    </script>
+</body>
+</html>
